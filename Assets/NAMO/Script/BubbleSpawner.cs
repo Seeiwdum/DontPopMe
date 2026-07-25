@@ -3,47 +3,30 @@ using UnityEngine;
 
 public class BubbleSpawner : MonoBehaviour
 {
-    [Header("Spawner Settings")]
     [SerializeField] private GameObject bubblePrefab;
-    [SerializeField] private float spawnInterval = 1.2f; // ความถี่ในการปล่อยฟองสบู่ (วินาที)
-    [SerializeField] private bool isSpawning = true;
-
-    [Header("Spawn Area Boundary")]
+    [SerializeField] private float minSpawnInterval = 0.6f;
+    [SerializeField] private float maxSpawnInterval = 1.5f;
     [SerializeField] private float spawnXMin = -8f;
     [SerializeField] private float spawnXMax = 8f;
-    [SerializeField] private float spawnYPosition = 6f; // ตำแหน่งเกิดเหนือขอบจอ
+    [SerializeField] private float spawnY = 6f;
 
-    private void Start()
+    private void OnEnable()
     {
         StartCoroutine(SpawnRoutine());
     }
 
     private IEnumerator SpawnRoutine()
     {
-        while (isSpawning)
+        while (enabled)
         {
-            yield return new WaitForSeconds(spawnInterval);
+            float waitTime = Random.Range(minSpawnInterval, maxSpawnInterval);
+            yield return new WaitForSeconds(waitTime);
 
             if (bubblePrefab != null)
             {
-                float randomX = Random.Range(spawnXMin, spawnXMax);
-                Vector3 spawnPos = new Vector3(randomX, spawnYPosition, 0f);
-
-                GameObject bubble = Instantiate(bubblePrefab, spawnPos, Quaternion.identity);
-
-                BubbleHazard bubbleScript = bubble.GetComponent<BubbleHazard>();
-                if (bubbleScript != null)
-                {
-                    bubbleScript.SetDirection(Vector2.down);
-                }
+                Vector3 spawnPos = new Vector3(Random.Range(spawnXMin, spawnXMax), spawnY, 0f);
+                Instantiate(bubblePrefab, spawnPos, Quaternion.identity);
             }
         }
-    }
-
-    // วาดเส้นขอบเขตในหน้า Scene เพื่อให้มองเห็นจุดสปอน
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawLine(new Vector3(spawnXMin, spawnYPosition, 0), new Vector3(spawnXMax, spawnYPosition, 0));
     }
 }
