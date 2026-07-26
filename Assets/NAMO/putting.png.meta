@@ -1,0 +1,511 @@
+fileFormatVersion: 2
+guid: d11cbe4cc1f2eef4b888e788c796c341
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2943644692818966232
+    second: putting_0
+  - first:
+      213: 1078290502017436810
+    second: putting_1
+  - first:
+      213: 4437867463669779396
+    second: putting_2
+  - first:
+      213: 3430917103724272127
+    second: putting_3
+  - first:
+      213: 475622755566524083
+    second: putting_4
+  - first:
+      213: 6768016117078942305
+    second: putting_5
+  - first:
+      213: -5774160359611120310
+    second: putting_6
+  - first:
+      213: -679458034137997232
+    second: putting_7
+  - first:
+      213: 595777738961936130
+    second: putting_8
+  - first:
+      213: -27922792722874544
+    second: putting_9
+  - first:
+      213: -1764998073420468820
+    second: putting_10
+  - first:
+      213: -4254306326796693089
+    second: putting_11
+  - first:
+      213: -3181843775074246229
+    second: putting_12
+  - first:
+      213: 3583170253005188126
+    second: putting_13
+  - first:
+      213: 5231141439747641496
+    second: putting_14
+  - first:
+      213: -5819757278061149992
+    second: putting_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: putting_0
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 2929
+        width: 469
+        height: 127
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d63074804de9d820800000000000000
+      internalID: 2943644692818966232
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: putting_1
+      rect:
+        serializedVersion: 2
+        x: 721
+        y: 2906
+        width: 471
+        height: 217
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a8c4d61af7bd6fe00800000000000000
+      internalID: 1078290502017436810
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: putting_2
+      rect:
+        serializedVersion: 2
+        x: 1333
+        y: 2899
+        width: 471
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4cb0d4402f8769d30800000000000000
+      internalID: 4437867463669779396
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: putting_3
+      rect:
+        serializedVersion: 2
+        x: 1921
+        y: 2891
+        width: 471
+        height: 244
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff91c459de01d9f20800000000000000
+      internalID: 3430917103724272127
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: putting_4
+      rect:
+        serializedVersion: 2
+        x: 90
+        y: 2263
+        width: 474
+        height: 317
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3b692a05060c99600800000000000000
+      internalID: 475622755566524083
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: putting_5
+      rect:
+        serializedVersion: 2
+        x: 700
+        y: 2257
+        width: 474
+        height: 318
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 162eb9cccc2dced50800000000000000
+      internalID: 6768016117078942305
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: putting_6
+      rect:
+        serializedVersion: 2
+        x: 1277
+        y: 2256
+        width: 474
+        height: 318
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a45cc39eebf0edfa0800000000000000
+      internalID: -5774160359611120310
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: putting_7
+      rect:
+        serializedVersion: 2
+        x: 1878
+        y: 2256
+        width: 474
+        height: 318
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0506b6394841296f0800000000000000
+      internalID: -679458034137997232
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: putting_8
+      rect:
+        serializedVersion: 2
+        x: 2327
+        y: 2090
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20f59ef62b0a44800800000000000000
+      internalID: 595777738961936130
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: putting_9
+      rect:
+        serializedVersion: 2
+        x: 60
+        y: 1580
+        width: 474
+        height: 370
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05fbd923e5ccc9ff0800000000000000
+      internalID: -27922792722874544
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: putting_10
+      rect:
+        serializedVersion: 2
+        x: 676
+        y: 1590
+        width: 474
+        height: 371
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cad26848a977187e0800000000000000
+      internalID: -1764998073420468820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: putting_11
+      rect:
+        serializedVersion: 2
+        x: 1285
+        y: 1595
+        width: 474
+        height: 371
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f911691afeaa5f4c0800000000000000
+      internalID: -4254306326796693089
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: putting_12
+      rect:
+        serializedVersion: 2
+        x: 1887
+        y: 1606
+        width: 474
+        height: 370
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba169e7d1f1d7d3d0800000000000000
+      internalID: -3181843775074246229
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: putting_14
+      rect:
+        serializedVersion: 2
+        x: 86
+        y: 872
+        width: 474
+        height: 370
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 890dbf57c6fb89840800000000000000
+      internalID: 5231141439747641496
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: putting_15
+      rect:
+        serializedVersion: 2
+        x: 703
+        y: 868
+        width: 474
+        height: 370
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d0cb2a07911c3fa0800000000000000
+      internalID: -5819757278061149992
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 27d007326e550b742aa0eed5c9dc4ed4
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      putting_0: 2943644692818966232
+      putting_1: 1078290502017436810
+      putting_10: -1764998073420468820
+      putting_11: -4254306326796693089
+      putting_12: -3181843775074246229
+      putting_13: 3583170253005188126
+      putting_14: 5231141439747641496
+      putting_15: -5819757278061149992
+      putting_2: 4437867463669779396
+      putting_3: 3430917103724272127
+      putting_4: 475622755566524083
+      putting_5: 6768016117078942305
+      putting_6: -5774160359611120310
+      putting_7: -679458034137997232
+      putting_8: 595777738961936130
+      putting_9: -27922792722874544
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

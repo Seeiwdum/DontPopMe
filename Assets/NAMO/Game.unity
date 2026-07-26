@@ -1450,7 +1450,6 @@ MonoBehaviour:
   minSpawnInterval: 0.12
   rampUpDuration: 30
   bubblesPerBurst: 3
-  eventCooldown: 7
 --- !u!4 &413392399
 Transform:
   m_ObjectHideFlags: 0
@@ -6408,11 +6407,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 3
-  healthBarFill: {fileID: 292480377}
-  damageFlashImage: {fileID: 140961164}
-  gameOverUI: {fileID: 506155926}
-  flashDuration: 0.2
-  flashColor: {r: 1, g: 0, b: 0, a: 0.4}
 --- !u!1 &1996242206
 GameObject:
   m_ObjectHideFlags: 0
