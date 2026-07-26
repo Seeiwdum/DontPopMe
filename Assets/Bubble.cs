@@ -1,70 +1,106 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class Bubble : MonoBehaviour
 {
-    public enum BubbleType { Normal, Fast, Homing, Mega }
+    public enum BubbleType { Normal, Fast, Homing, Mega, Spiral }
 
-    [Header("Bubble Settings")]
+    [Header("Type & Speed")]
     public BubbleType type = BubbleType.Normal;
-    [SerializeField] private float baseSpeed = 4f;
-    [SerializeField] private float rotateSpeed = 100f; // เลี้ยวตาม Player
-    [SerializeField] private float lifetime = 10f;
+    [SerializeField] private float baseSpeed = 8f;         // เพิ่มความเร็วตั้งต้นขึ้น
+    [SerializeField] private float homingSteerSpeed = 5f;  // ความไวในการเลี้ยวตาม Player
 
-    private Vector2 moveDirection;
+    [Header("Visual Juice (Smooth Wobble)")]
+    [SerializeField] private float wobbleSpeed = 6f;      // ความเร็วในการกระดุกกระดิก
+    [SerializeField] private float wobbleAmount = 0.08f;   // ระยะการยืดหดของฟองสบู่
+
+    private Rigidbody2D rb;
     private Transform playerTransform;
+    private Vector2 currentDirection;
     private float currentSpeed;
-    private float homingTimer = 3f; // ฟองติดตามจะตาม Player แค่ 3 วินาทีแรก
+    private Vector3 initialScale;
+    private float randomOffset;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        rb.gravityScale = 0f;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous; // เพื่อความเนียน ไม่ทะลุ
+        initialScale = transform.localScale;
+        randomOffset = Random.Range(0f, 100f);
+    }
 
     public void Init(Vector2 direction, float speedMultiplier = 1f, Transform player = null)
     {
-        moveDirection = direction.normalized;
+        currentDirection = direction.normalized;
         currentSpeed = baseSpeed * speedMultiplier;
         playerTransform = player;
 
-        // ปรับขนาด/ความเร็วตามประเภทฟอง
+        // ปรับคุณสมบัติตามประเภทฟองสบู่
         switch (type)
         {
             case BubbleType.Fast:
-                currentSpeed *= 1.8f;
-                transform.localScale = Vector3.one * 0.7f;
+                currentSpeed *= 2.2f;
+                transform.localScale = initialScale * 0.65f;
                 break;
             case BubbleType.Mega:
-                currentSpeed *= 0.6f;
-                transform.localScale = Vector3.one * 2.2f;
+                currentSpeed *= 0.7f;
+                transform.localScale = initialScale * 2.5f;
                 break;
             case BubbleType.Homing:
-                currentSpeed *= 1.1f;
+                currentSpeed *= 1.2f;
+                break;
+            case BubbleType.Spiral:
+                currentSpeed *= 1.4f;
                 break;
         }
 
-        Destroy(gameObject, lifetime);
+        // กำหนดความเร็วฟิสิกส์ทันที (เนียนตากว่า Translate)
+        rb.linearVelocity = currentDirection * currentSpeed;
+
+        // ทำลายตัวเองหลังผ่านไป 8 วินาที
+        Destroy(gameObject, 8f);
+    }
+
+    private void FixedUpdate()
+    {
+        // ระบบเลี้ยวติดตามแบบ Smooth
+        if (type == BubbleType.Homing && playerTransform != null)
+        {
+            Vector2 targetDir = ((Vector2)playerTransform.position - rb.position).normalized;
+            currentDirection = Vector2.Lerp(currentDirection, targetDir, Time.fixedDeltaTime * homingSteerSpeed).normalized;
+            rb.linearVelocity = currentDirection * currentSpeed;
+        }
+        else if (type == BubbleType.Spiral)
+        {
+            // ยิงเบี่ยงโค้งเล็กน้อยเป็นวงคลื่น
+            float sineAngle = Mathf.Sin(Time.time * 5f + randomOffset) * 1.5f;
+            Vector2 spiralDir = Quaternion.Euler(0, 0, sineAngle * 30f) * currentDirection;
+            rb.linearVelocity = spiralDir * currentSpeed;
+        }
     }
 
     private void Update()
     {
-        // ถ้าเป็นฟองโฮมมิ่ง จะค่อยๆ เลี้ยวหัวเข้าหา Player
-        if (type == BubbleType.Homing && playerTransform != null && homingTimer > 0)
-        {
-            homingTimer -= Time.deltaTime;
-            Vector2 targetDir = (playerTransform.position - transform.position).normalized;
-            moveDirection = Vector2.Lerp(moveDirection, targetDir, Time.deltaTime * 2.5f).normalized;
-        }
-
-        // เคลื่อนที่ไปตามทิศทาง
-        transform.Translate(moveDirection * currentSpeed * Time.deltaTime, Space.World);
+        // เอฟเฟกต์ฟองสบู่กระพริบ/ยืดหด (Wobble Effect) เพิ่มความสมจริง
+        float wave = Mathf.Sin(Time.time * wobbleSpeed + randomOffset) * wobbleAmount;
+        transform.localScale = new Vector3(
+            initialScale.x + wave,
+            initialScale.y - wave,
+            initialScale.z
+        );
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
         {
-            // เรียกใช้ฟังก์ชันโดนชนจาก Player (หรือ GameOver)
             PlayerHealth playerHealth = collision.GetComponent<PlayerHealth>();
             if (playerHealth != null)
             {
                 playerHealth.TakeDamage(1);
             }
-            Destroy(gameObject); // ชนสิวแล้วฟองแตก
+            Destroy(gameObject);
         }
     }
 }

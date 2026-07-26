@@ -1,4 +1,4 @@
-using System.Collections;
+๏ปฟusing System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -10,46 +10,45 @@ public class PlayerHealth : MonoBehaviour
     private int currentHealth;
 
     [Header("UI References")]
-    [SerializeField] private Image healthBarFill;       // Image ของหลอดเลือด (ตั้งเป็น Image Type: Filled)
-    [SerializeField] private Image damageFlashImage;    // Image สีแดงเต็มหน้าจอ หรือตัว UI สำหรับกระพริบแดง
-    [SerializeField] private GameObject gameOverUI;     // Panel หน้าจอ Game Over
+    [SerializeField] private Image healthBarFill;       // เธฃเธนเธ UI เธซเธฅเธญเธ”เน€เธฅเธทเธญเธ” (เธ•เนเธญเธเน€เธเนเธ Image Type: Filled)
+    [SerializeField] private Image damageFlashImage;    // UI เนเธเนเธเธชเธตเนเธ”เธเน€เธ•เนเธกเธเธญเธชเธณเธซเธฃเธฑเธเธเธฃเธฐเธเธฃเธดเธ
+    [SerializeField] private GameObject gameOverUI;     // Panel เธซเธเนเธฒเธเธญ Game Over
 
     [Header("Damage Effect Settings")]
-    [SerializeField] private float flashDuration = 0.2f; // ระยะเวลากระพริบสีแดง
-    [SerializeField] private Color flashColor = new Color(1f, 0f, 0f, 0.4f); // สีแดงโปร่งแสง
+    [SerializeField] private float flashDuration = 0.2f;
+    [SerializeField] private Color flashColor = new Color(1f, 0f, 0f, 0.4f);
 
     private SpriteRenderer playerSprite;
     private bool isDead = false;
-    private bool isInvulnerable = false; // กันโดนชนรวดเดียวตาย
+    private bool isInvulnerable = false;
 
     private void Start()
     {
         currentHealth = maxHealth;
         playerSprite = GetComponent<SpriteRenderer>();
 
-        if (gameOverUI != null)
-        {
-            gameOverUI.SetActive(false);
-        }
+        if (gameOverUI != null) gameOverUI.SetActive(false);
 
         UpdateHealthUI();
     }
 
     public void TakeDamage(int damage)
     {
-        // ถ้าตายแล้ว หรืออยู่ในช่วงอมตะ/ใช้อยู่ใต้มุดดิน ให้ข้าม
+        // เธ–เนเธฒเธ•เธฒเธขเนเธฅเนเธง เธซเธฃเธทเธญเธญเธขเธนเนเนเธเธเนเธงเธเธญเธกเธ•เธฐ เนเธซเนเธเนเธฒเธก
         if (isDead || isInvulnerable) return;
 
         currentHealth -= damage;
         if (currentHealth < 0) currentHealth = 0;
 
-        // อัปเดต UI หลอดเลือด
+        Debug.Log($"<color=red>[Damage!]</color> Player เนเธ”เธเธเธงเธฒเธกเน€เธชเธตเธขเธซเธฒเธข! เน€เธฅเธทเธญเธ”เน€เธซเธฅเธทเธญ: {currentHealth}/{maxHealth}");
+
+        // เธญเธฑเธเน€เธ”เธ•เธซเธฅเธญเธ” UI
         UpdateHealthUI();
 
-        // เล่นเอฟเฟกต์กระพริบสีแดง
+        // เน€เธฅเนเธเน€เธญเธเน€เธเธเธ•เนเธเธฃเธฐเธเธฃเธดเธเนเธ”เธ
         StartCoroutine(DamageFlashRoutine());
 
-        // เช็กเงื่อนไขการตาย
+        // เน€เธเนเธเธเธฒเธฃเธ•เธฒเธข
         if (currentHealth <= 0)
         {
             Die();
@@ -60,8 +59,14 @@ public class PlayerHealth : MonoBehaviour
     {
         if (healthBarFill != null)
         {
-            // คำนวณอัตราส่วนเลือด (0.0 - 1.0) ทำให้หลอดเลือดยาว/สั้นลง
-            healthBarFill.fillAmount = (float)currentHealth / maxHealth;
+            // เธเธณเธเธงเธ“เธญเธฑเธ•เธฃเธฒเธชเนเธงเธ 0.0 - 1.0 เน€เธเธทเนเธญเธเธฃเธฑเธเธเธงเธฒเธกเธขเธฒเธงเธซเธฅเธญเธ”เน€เธฅเธทเธญเธ”
+            float healthRatio = (float)currentHealth / maxHealth;
+            healthBarFill.fillAmount = healthRatio;
+            Debug.Log($"[UI Update] Fill Amount เธเธฃเธฑเธเน€เธเนเธ: {healthRatio}");
+        }
+        else
+        {
+            Debug.LogWarning("โ ๏ธ เธขเธฑเธเนเธกเนเนเธ”เนเธฅเธฒเธเธฃเธนเธ Health Bar Fill เธกเธฒเนเธชเนเนเธ Inspector เธเธญเธ PlayerHealth!");
         }
     }
 
@@ -69,55 +74,36 @@ public class PlayerHealth : MonoBehaviour
     {
         isInvulnerable = true;
 
-        // 1. กระพริบสีแดงที่ UI (ถ้าใส่ damageFlashImage ไว้)
-        if (damageFlashImage != null)
-        {
-            damageFlashImage.color = flashColor;
-        }
-
-        // 2. กระพริบตัวละคร Player เป็นสีแดง
-        if (playerSprite != null)
-        {
-            playerSprite.color = Color.red;
-        }
+        if (damageFlashImage != null) damageFlashImage.color = flashColor;
+        if (playerSprite != null) playerSprite.color = Color.red;
 
         yield return new WaitForSeconds(flashDuration);
 
-        // คืนค่าสีเดิม
-        if (damageFlashImage != null)
-        {
-            damageFlashImage.color = Color.clear;
-        }
+        if (damageFlashImage != null) damageFlashImage.color = Color.clear;
+        if (playerSprite != null) playerSprite.color = Color.white;
 
-        if (playerSprite != null)
-        {
-            playerSprite.color = Color.white;
-        }
-
-        yield return new WaitForSeconds(0.3f); // เวลา อมตะหลังโดนชนแป๊บนึง
+        yield return new WaitForSeconds(0.3f); // เธเนเธงเธเน€เธงเธฅเธฒเธญเธกเธ•เธฐเธซเธฅเธฑเธเนเธ”เธเธเธ
         isInvulnerable = false;
     }
 
     private void Die()
     {
         isDead = true;
-        Debug.Log("Player ตายแล้ว!");
+        Debug.Log("๐’€ Player เธ•เธฒเธขเนเธฅเนเธง!");
 
-        // หยุดการเคลื่อนที่หรือซ่อนตัวละคร
+        // เธเนเธญเธเธ•เธฑเธงเธฅเธฐเธเธฃ
         gameObject.SetActive(false);
 
-        // แสดงหน้าจอ Game Over
+        // เธเธถเนเธเธซเธเนเธฒเธเธญ Game Over
         if (gameOverUI != null)
         {
             gameOverUI.SetActive(true);
         }
     }
 
-    // ฟังก์ชันสำหรับกดปุ่ม Replay ใน UI
     public void ReplayGame()
     {
-        Time.timeScale = 1f; // รีเซ็ตเวลาในเกมให้ปกติกรณีมีการ Pause
-        Scene currentScene = SceneManager.GetActiveScene();
-        SceneManager.LoadScene(currentScene.name); // โหลด Scene ปัจจุบันใหม่
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
