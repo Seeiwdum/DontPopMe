@@ -8,22 +8,17 @@ public class BubbleSpawner : MonoBehaviour
     [SerializeField] private Transform playerTransform;
     [SerializeField] private BoxCollider2D mapBoundsCollider;
 
-    [Header("Super Fast Spawn Settings")]
-    [Tooltip("ระยะห่างการสปอว์นเริ่มต้น (วินาที)")]
-    [SerializeField] private float startSpawnInterval = 0.15f;
-    [Tooltip("ระยะห่างการสปอว์นที่เร็วที่สุด (วินาที)")]
-    [SerializeField] private float minSpawnInterval = 0.03f;
-    [SerializeField] private float rampUpDuration = 25f;
+    [Header("Extreme Spawn Rates")]
+    [SerializeField] private float startSpawnInterval = 0.1f;  // ปล่อยรัวตั้งแต่เริ่ม (ทุก 0.1s)
+    [SerializeField] private float minSpawnInterval = 0.02f;   // รัวสุดๆ ทุก 0.02s!
+    [SerializeField] private float rampUpDuration = 20f;
+    [SerializeField] private int bubblesPerBurst = 3;          // ออกมาพร้อมกันทีละ 3 ลูก
 
-    [Header("Multi-Spawn & Pattern")]
-    [Tooltip("จำนวนฟองสบู่ที่ออกมาพร้อมกันต่อ 1 รอบ")]
-    [SerializeField] private int bubblesPerSpawn = 3;
-
-    [SerializeField] private float waveInterval = 6f; // พายุสปอว์นถี่ขึ้นทุก 6 วิ
-    [SerializeField] private int waveCount = 20;
+    [Header("Event Bullet Hell")]
+    [SerializeField] private float eventCooldown = 7f;         // พายุเข้าบ่อยขึ้นทุก 7 วิ
 
     private float timer = 0f;
-    private float waveTimer = 0f;
+    private float eventTimer = 0f;
     private float gameTime = 0f;
 
     private void Awake()
@@ -41,106 +36,125 @@ public class BubbleSpawner : MonoBehaviour
 
         gameTime += Time.deltaTime;
         timer += Time.deltaTime;
-        waveTimer += Time.deltaTime;
+        eventTimer += Time.deltaTime;
 
-        // คำนวณความถี่ให้เร็วขึ้นเรื่อยๆ ตามเวลา
         float progress = Mathf.Clamp01(gameTime / rampUpDuration);
         float currentInterval = Mathf.Lerp(startSpawnInterval, minSpawnInterval, progress);
 
-        // สปอว์นถล่มถี่ๆ
         if (timer >= currentInterval)
         {
             timer = 0f;
-            // สปอว์นทีละหลายลูกพร้อมกันให้ทั่วแมพ
-            for (int i = 0; i < bubblesPerSpawn; i++)
+            for (int i = 0; i < bubblesPerBurst; i++)
             {
-                SpawnBubbleAcrossMap();
+                SpawnHardcoreBubble();
             }
         }
 
-        // Event พายุฟองสบู่ระเบิดทั่วแมพ
-        if (waveTimer >= waveInterval)
+        if (eventTimer >= eventCooldown)
         {
-            waveTimer = 0f;
-            StartCoroutine(SpawnFullMapShowerWave());
+            eventTimer = 0f;
+            // สุ่ม Event ความโหด
+            if (Random.value < 0.5f)
+                StartCoroutine(SpiralStormPattern());
+            else
+                StartCoroutine(CrossfireRainPattern());
         }
     }
 
-    // สปอว์นฟองสบู่ให้ตกกระจายทั่วแมพ
-    private void SpawnBubbleAcrossMap()
+    private void SpawnHardcoreBubble()
     {
         Bounds bounds = mapBoundsCollider.bounds;
+        Vector2 spawnPos = GetRandomEdgePosition(bounds);
 
-        // 1. สุ่มพิกัด X แบบสุ่มเต็มความกว้างของแมพ (กระจายทั่วซ้าย-ขวา)
-        float randomX = Random.Range(bounds.min.x, bounds.max.x);
-        // สุ่มจุดเกิดเหนือขอบบนแมพเล็กน้อย
-        Vector2 spawnPos = new Vector2(randomX, bounds.max.y + Random.Range(1f, 3f));
+        // ดักทางหน้า Player สุ่มเบี่ยงทิศเล็กน้อย
+        Vector2 targetPos = (playerTransform != null)
+            ? (Vector2)playerTransform.position + (Vector2)Random.insideUnitSphere * 2f
+            : (Vector2)bounds.center;
 
-        // 2. ให้ทิศทางพุ่งลงด้านล่าง + เอียงสุ่มเบาๆ เพื่อให้วิถีดูเป็นธรรมชาติ
-        Vector2 direction = new Vector2(Random.Range(-0.3f, 0.3f), -1f).normalized;
-
-        // 3. สุ่มโอกาสให้บางลูกพุ่งตรงหา Player เพื่อเพิ่มความกดดัน
-        if (Random.value < 0.25f && playerTransform != null)
-        {
-            // สุ่มเกิดจากขอบแมพฝั่งอื่นๆ ด้วย (ซ้าย/ขวา/ล่าง)
-            spawnPos = GetRandomEdgePosition(bounds);
-            direction = ((Vector2)playerTransform.position - spawnPos).normalized;
-        }
+        Vector2 direction = (targetPos - spawnPos).normalized;
 
         GameObject obj = Instantiate(bubblePrefab, spawnPos, Quaternion.identity);
         Bubble bubble = obj.GetComponent<Bubble>();
 
         if (bubble != null)
         {
-            // สุ่มประเภทฟองสบู่
             float rand = Random.value;
-            if (rand < 0.50f) bubble.type = Bubble.BubbleType.Normal;
-            else if (rand < 0.75f) bubble.type = Bubble.BubbleType.Fast;
-            else if (rand < 0.90f) bubble.type = Bubble.BubbleType.Spiral;
-            else bubble.type = Bubble.BubbleType.Homing;
+            if (rand < 0.35f) bubble.type = Bubble.BubbleType.Normal;
+            else if (rand < 0.60f) bubble.type = Bubble.BubbleType.Fast;
+            else if (rand < 0.80f) bubble.type = Bubble.BubbleType.Sine;
+            else if (rand < 0.92f) bubble.type = Bubble.BubbleType.Homing;
+            else bubble.type = Bubble.BubbleType.MegaSplit;
 
-            float speedBonus = 1f + (gameTime / rampUpDuration) * 0.6f;
-            bubble.Init(direction, speedBonus, playerTransform);
+            float speedBonus = 1f + (gameTime / rampUpDuration) * 0.8f;
+            bubble.Init(direction, speedBonus, playerTransform, bubblePrefab);
         }
     }
 
-    // พายุฟองสบู่ตกลงมาจากฟ้าแบบ Rain Shower เต็มแมพ
-    private IEnumerator SpawnFullMapShowerWave()
+    // Pattern 1: พายุควงสว่าน บีบเข้าหาศูนย์กลาง (Spiral Storm)
+    private IEnumerator SpiralStormPattern()
     {
         if (GameTutorialManager.Instance != null)
+            yield return GameTutorialManager.Instance.ShowBanner("⚠️ เตือนภัย: พายุควงสว่านถล่มผิว!!");
+
+        yield return new WaitForSeconds(0.4f);
+
+        Vector2 center = (playerTransform != null) ? (Vector2)playerTransform.position : Vector2.zero;
+        float radius = 12f;
+        int count = 24;
+
+        for (int i = 0; i < count; i++)
         {
-            yield return GameTutorialManager.Instance.ShowBanner("An avalanche of facial cleansing foam!!");
-        }
-
-        yield return new WaitForSeconds(0.5f);
-
-        Bounds bounds = mapBoundsCollider.bounds;
-
-        // ปล่อยฟองสบู่เรียงแถวกระจายจากซ้ายไปขวาตกลงมาพร้อมกัน
-        for (int i = 0; i < waveCount; i++)
-        {
-            float randomX = Random.Range(bounds.min.x, bounds.max.x);
-            Vector2 spawnPos = new Vector2(randomX, bounds.max.y + 2f);
-            Vector2 dir = new Vector2(0, -1f); // พุ่งลงตรงๆ ด้วยความเร็วสูง
+            float angle = i * (360f / count);
+            Vector2 spawnPos = center + new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad)) * radius;
+            Vector2 dir = (center - spawnPos).normalized;
 
             GameObject obj = Instantiate(bubblePrefab, spawnPos, Quaternion.identity);
             Bubble bubble = obj.GetComponent<Bubble>();
             if (bubble != null)
             {
                 bubble.type = Bubble.BubbleType.Fast;
-                bubble.Init(dir, 1.5f, playerTransform);
+                bubble.Init(dir, 1.4f, playerTransform);
             }
-
-            yield return new WaitForSeconds(0.04f); // ปล่อยรัวรวดเดียว!
+            yield return new WaitForSeconds(0.03f); // ปล่อยไล่ระดับเป็นสาย
         }
 
-        yield return new WaitForSeconds(1.2f);
+        yield return new WaitForSeconds(1f);
+        if (GameTutorialManager.Instance != null) GameTutorialManager.Instance.HideBanner();
+    }
+
+    // Pattern 2: ห่าฝนไขว้ข้ามทิศทาง (Crossfire Rain)
+    private IEnumerator CrossfireRainPattern()
+    {
+        if (GameTutorialManager.Instance != null)
+            yield return GameTutorialManager.Instance.ShowBanner("⚠️ เตือนภัย: ห่าฝนกรดฟองสบู่!!");
+
+        yield return new WaitForSeconds(0.4f);
+
+        Bounds bounds = mapBoundsCollider.bounds;
+        int lines = 15;
+
+        for (int i = 0; i < lines; i++)
+        {
+            // ยิงจากขอบบนพุ่งลง และ ยิงจากขอบซ้ายพุ่งขวา (กากบาท)
+            Vector2 topPos = new Vector2(Random.Range(bounds.min.x, bounds.max.x), bounds.max.y + 2f);
+            Vector2 leftPos = new Vector2(bounds.min.x - 2f, Random.Range(bounds.min.y, bounds.max.y));
+
+            GameObject b1 = Instantiate(bubblePrefab, topPos, Quaternion.identity);
+            b1.GetComponent<Bubble>()?.Init(Vector2.down, 1.5f, playerTransform);
+
+            GameObject b2 = Instantiate(bubblePrefab, leftPos, Quaternion.identity);
+            b2.GetComponent<Bubble>()?.Init(Vector2.right, 1.5f, playerTransform);
+
+            yield return new WaitForSeconds(0.05f);
+        }
+
+        yield return new WaitForSeconds(1f);
         if (GameTutorialManager.Instance != null) GameTutorialManager.Instance.HideBanner();
     }
 
     private Vector2 GetRandomEdgePosition(Bounds bounds)
     {
-        float padding = 2f;
+        float padding = 2.5f;
         int edge = Random.Range(0, 4);
         switch (edge)
         {

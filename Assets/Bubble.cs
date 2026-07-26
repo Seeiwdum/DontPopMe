@@ -3,23 +3,30 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class Bubble : MonoBehaviour
 {
-    public enum BubbleType { Normal, Fast, Homing, Mega, Spiral }
+    public enum BubbleType { Normal, Fast, Homing, Sine, MegaSplit }
 
-    [Header("Type & Speed")]
+    [Header("Type & Base Settings")]
     public BubbleType type = BubbleType.Normal;
-    [SerializeField] private float baseSpeed = 8f;         // เพิ่มความเร็วตั้งต้นขึ้น
-    [SerializeField] private float homingSteerSpeed = 5f;  // ความไวในการเลี้ยวตาม Player
+    [SerializeField] private float baseSpeed = 10f;
 
-    [Header("Visual Juice (Smooth Wobble)")]
-    [SerializeField] private float wobbleSpeed = 6f;      // ความเร็วในการกระดุกกระดิก
-    [SerializeField] private float wobbleAmount = 0.08f;   // ระยะการยืดหดของฟองสบู่
+    [Header("Homing & Sine Settings")]
+    [SerializeField] private float homingSteerSpeed = 8f;
+    [SerializeField] private float sineFrequency = 5f;
+    [SerializeField] private float sineMagnitude = 3f;
+
+    [Header("Split Settings")]
+    [SerializeField] private GameObject miniBubblePrefab; // Prefab ลูกเล็กสำหรับแตกตัว
+    [SerializeField] private float splitDelay = 1.5f;
 
     private Rigidbody2D rb;
     private Transform playerTransform;
     private Vector2 currentDirection;
     private float currentSpeed;
     private Vector3 initialScale;
-    private float randomOffset;
+
+    private float spawnTime;
+    private Vector2 moveVelocity;
+    private bool isSplit = false;
 
     private void Awake()
     {
@@ -27,68 +34,94 @@ public class Bubble : MonoBehaviour
         rb.gravityScale = 0f;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous; // เพื่อความเนียน ไม่ทะลุ
         initialScale = transform.localScale;
-        randomOffset = Random.Range(0f, 100f);
+        spawnTime = Time.time;
     }
 
-    public void Init(Vector2 direction, float speedMultiplier = 1f, Transform player = null)
+    public void Init(Vector2 direction, float speedMultiplier = 1f, Transform player = null, GameObject miniPrefab = null)
     {
         currentDirection = direction.normalized;
         currentSpeed = baseSpeed * speedMultiplier;
         playerTransform = player;
+        miniBubblePrefab = miniPrefab;
 
-        // ปรับคุณสมบัติตามประเภทฟองสบู่
         switch (type)
         {
             case BubbleType.Fast:
-                currentSpeed *= 2.2f;
-                transform.localScale = initialScale * 0.65f;
+                currentSpeed *= 2.5f;
+                transform.localScale = initialScale * 0.7f;
                 break;
-            case BubbleType.Mega:
-                currentSpeed *= 0.7f;
-                transform.localScale = initialScale * 2.5f;
+
+            case BubbleType.MegaSplit:
+                currentSpeed *= 0.6f;
+                transform.localScale = initialScale * 2.2f;
+                Invoke(nameof(SplitIntoMiniBubbles), splitDelay);
                 break;
+
             case BubbleType.Homing:
-                currentSpeed *= 1.2f;
+                currentSpeed *= 1.1f;
                 break;
-            case BubbleType.Spiral:
-                currentSpeed *= 1.4f;
+
+            case BubbleType.Sine:
+                currentSpeed *= 1.3f;
                 break;
         }
 
-        // กำหนดความเร็วฟิสิกส์ทันที (เนียนตากว่า Translate)
-        rb.linearVelocity = currentDirection * currentSpeed;
-
-        // ทำลายตัวเองหลังผ่านไป 8 วินาที
         Destroy(gameObject, 8f);
     }
 
     private void FixedUpdate()
     {
-        // ระบบเลี้ยวติดตามแบบ Smooth
+        float aliveTime = Time.time - spawnTime;
+        Vector2 targetVelocity = currentDirection * currentSpeed;
+
+        // 1. ลอจิกการเคลื่อนที่ตามประเภท
         if (type == BubbleType.Homing && playerTransform != null)
         {
             Vector2 targetDir = ((Vector2)playerTransform.position - rb.position).normalized;
             currentDirection = Vector2.Lerp(currentDirection, targetDir, Time.fixedDeltaTime * homingSteerSpeed).normalized;
-            rb.linearVelocity = currentDirection * currentSpeed;
+            targetVelocity = currentDirection * currentSpeed;
         }
-        else if (type == BubbleType.Spiral)
+        else if (type == BubbleType.Sine)
         {
-            // ยิงเบี่ยงโค้งเล็กน้อยเป็นวงคลื่น
-            float sineAngle = Mathf.Sin(Time.time * 5f + randomOffset) * 1.5f;
-            Vector2 spiralDir = Quaternion.Euler(0, 0, sineAngle * 30f) * currentDirection;
-            rb.linearVelocity = spiralDir * currentSpeed;
+            Vector2 perpendicular = new Vector2(-currentDirection.y, currentDirection.x);
+            float sine = Mathf.Sin(aliveTime * sineFrequency) * sineMagnitude;
+            targetVelocity = (currentDirection * currentSpeed) + (perpendicular * sine);
         }
+
+        // 2. เคลื่อนที่ด้วย Physics MovePosition แบบเนียนระดับ 100 FPS
+        Vector2 nextPos = rb.position + targetVelocity * Time.fixedDeltaTime;
+        rb.MovePosition(nextPos);
     }
 
     private void Update()
     {
-        // เอฟเฟกต์ฟองสบู่กระพริบ/ยืดหด (Wobble Effect) เพิ่มความสมจริง
-        float wave = Mathf.Sin(Time.time * wobbleSpeed + randomOffset) * wobbleAmount;
-        transform.localScale = new Vector3(
-            initialScale.x + wave,
-            initialScale.y - wave,
-            initialScale.z
-        );
+        // เอฟเฟกต์ยืดหด (Juice Animation) ตามจังหวะ
+        float wave = Mathf.Sin((Time.time - spawnTime) * 8f) * 0.08f;
+        transform.localScale = new Vector3(initialScale.x + wave, initialScale.y - wave, initialScale.z);
+    }
+
+    private void SplitIntoMiniBubbles()
+    {
+        if (isSplit) return;
+        isSplit = true;
+
+        // แตกออกเป็น 8 ลูก พุ่งกระจายเป็นวงกลม 360 องศา
+        int count = 8;
+        for (int i = 0; i < count; i++)
+        {
+            float angle = i * (360f / count);
+            Vector2 dir = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
+
+            GameObject mini = Instantiate(miniBubblePrefab != null ? miniBubblePrefab : gameObject, transform.position, Quaternion.identity);
+            Bubble b = mini.GetComponent<Bubble>();
+            if (b != null)
+            {
+                b.type = BubbleType.Fast;
+                b.Init(dir, 1.2f, playerTransform);
+            }
+        }
+
+        Destroy(gameObject); // ทำลายลูกใหญ่ทิ้ง
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -100,6 +133,12 @@ public class Bubble : MonoBehaviour
             {
                 playerHealth.TakeDamage(1);
             }
+
+            if (type == BubbleType.MegaSplit)
+            {
+                CancelInvoke(nameof(SplitIntoMiniBubbles));
+            }
+
             Destroy(gameObject);
         }
     }

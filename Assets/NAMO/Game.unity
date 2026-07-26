@@ -1449,9 +1449,8 @@ MonoBehaviour:
   startSpawnInterval: 0.5
   minSpawnInterval: 0.12
   rampUpDuration: 30
-  bubblesPerSpawn: 5
-  waveInterval: 6
-  waveCount: 12
+  bubblesPerBurst: 3
+  eventCooldown: 7
 --- !u!4 &413392399
 Transform:
   m_ObjectHideFlags: 0
