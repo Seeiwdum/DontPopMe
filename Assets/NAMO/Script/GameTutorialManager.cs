@@ -54,7 +54,7 @@ public class GameTutorialManager : MonoBehaviour
         // 1. WASD Movement Quest
         // -------------------------------------------------------------
         CurrentState = QuestState.Movement;
-        yield return ShowBanner("กดปุ่ม W, A, S, D เพื่อทดลองเดิน");
+        yield return ShowBanner("Press W, A, S, D to move");
         
         bool w = false, a = false, s = false, d = false;
         while (!(w && a && s && d))
@@ -70,7 +70,7 @@ public class GameTutorialManager : MonoBehaviour
         // 2. Skill Quest (1, 2, 3)
         // -------------------------------------------------------------
         CurrentState = QuestState.TrySkills;
-        yield return ShowBanner("ทดลองกดใช้งานสกิล [1], [2], [3] ให้ครบทุกสกิล");
+        yield return ShowBanner("Try your skill [1], [2], [3] ");
         
         while (!(pressed1 && pressed2 && pressed3))
         {
@@ -81,7 +81,7 @@ public class GameTutorialManager : MonoBehaviour
         // 3. Unlock Zone & Overview Camera Effect
         // -------------------------------------------------------------
         CurrentState = QuestState.ZoneUnlocking;
-        yield return ShowBanner("ฝึกสอนสำเร็จ! ปลดล็อคเส้นทาง...");
+        yield return ShowBanner("Done! Unlock new path...");
 
         // ปิดกำแพงล่องหน
         if (invisibleWalls != null) invisibleWalls.SetActive(false);
@@ -125,14 +125,14 @@ public class GameTutorialManager : MonoBehaviour
         // 4. Free Roam (วิ่งเล่นบนแมพใหญ่)
         // -------------------------------------------------------------
         CurrentState = QuestState.FreeRoam;
-        yield return ShowBanner("สำรวจพื้นที่ผิวหน้าได้ตามอิสระ");
-        yield return new WaitForSeconds(3f);
+        yield return ShowBanner("Survey the area");
+        yield return new WaitForSeconds(6f);
 
         // -------------------------------------------------------------
         // 5. Event Washing Face
         // -------------------------------------------------------------
         CurrentState = QuestState.WashingFaceEvent;
-        yield return ShowBanner("⚠️ เขากำลังจะล้างหน้าแล้ว!! หลบฟองสบู่เร็ว!");
+        yield return ShowBanner("She is about to wash her face!! dodge the bubbles!");
         yield return new WaitForSeconds(2.5f);
 
         // -------------------------------------------------------------
