@@ -4,11 +4,18 @@ using DG.Tweening;
 
 public class JuicyButtonFX : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
 {
-    [Header("Audio Settings (เสียง SFX)")]
-    public AudioSource audioSource;       // ตัวเล่นเสียง (ถ้าไม่ใส่ สคริปต์จะหาให้อัตโนมัติ)
-    public AudioClip hoverSFX;            // เสียงตอนเอาเมาส์ไปจ่อ (จะใส่หรือไม่ใส่ก็ได้)
-    public AudioClip clickSFX;            // เสียงตอนกดคลิก (ใส่ไฟล์เสียง SFX ตรงนี้)
-    [Range(0f, 1f)] public float soundVolume = 1f; // ความดังของเสียง SFX
+    [Header("Audio Spectrum Settings (เด้งตาม Beat เพลง)")]
+    public AudioSource BGM_AudioSource;          // AudioSource ของเพลงหลัก
+    public bool enableBeatPulse = true;          // เปิด/ปิด การเด้งตามเพลง
+    [Range(0, 63)] public int frequencyIndex = 2;// ย่านความถี่เบส
+    public float beatSensitivity = 3f;           // ความไวต่อเพลง (ตั้งค่าน้อยๆ ให้เด้งเบากว่า Title)
+    public float maxBeatScale = 0.08f;           // ขีดจำกัดความใหญ่สูงสุดตอนเด้งตามเพลง (เบาๆ เบื้องต้น 8%)
+
+    [Header("Audio Settings (เสียง SFX ปุ่ม)")]
+    public AudioSource sfxAudioSource;
+    public AudioClip hoverSFX;
+    public AudioClip clickSFX;
+    [Range(0f, 1f)] public float soundVolume = 1f;
 
     [Header("Hover Settings (เมาส์จ่อ)")]
     public float hoverScale = 1.15f;
@@ -22,17 +29,18 @@ public class JuicyButtonFX : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     private Vector3 originalScale;
     private bool isHovered = false;
+    private float[] spectrumData = new float[64];
+    private float currentAudioPulse = 0f;
 
     void Awake()
     {
-        // ถ้าไม่ได้ลาก AudioSource มาใส่ จะพยายามดึง AudioSource จากในเครื่องหรือสร้างให้อัตโนมัติ
-        if (audioSource == null)
+        if (sfxAudioSource == null)
         {
-            audioSource = GetComponent<AudioSource>();
-            if (audioSource == null)
+            sfxAudioSource = GetComponent<AudioSource>();
+            if (sfxAudioSource == null)
             {
-                audioSource = gameObject.AddComponent<AudioSource>();
-                audioSource.playOnAwake = false;
+                sfxAudioSource = gameObject.AddComponent<AudioSource>();
+                sfxAudioSource.playOnAwake = false;
             }
         }
     }
@@ -42,15 +50,39 @@ public class JuicyButtonFX : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         originalScale = transform.localScale;
     }
 
+    void Update()
+    {
+        // คำนวณ Beat เพลงเฉพาะเวลาที่ไม่ได้เอามือไปจ่อหรือกดปุ่มอยู่
+        if (enableBeatPulse && !isHovered)
+        {
+            HandleBeatPulse();
+        }
+    }
+
+    // วิเคราะห์ Beat เพลงแบบเบาๆ
+    void HandleBeatPulse()
+    {
+        if (BGM_AudioSource == null || !BGM_AudioSource.isPlaying) return;
+
+        BGM_AudioSource.GetSpectrumData(spectrumData, 0, FFTWindow.BlackmanHarris);
+
+        float targetScale = spectrumData[frequencyIndex] * beatSensitivity;
+        targetScale = Mathf.Clamp(targetScale, 0f, maxBeatScale);
+
+        currentAudioPulse = Mathf.Lerp(currentAudioPulse, targetScale, Time.deltaTime * 15f);
+
+        // นำค่า Beat ไปบวกเพิ่มจากขนาดเดิมของปุ่ม
+        transform.localScale = originalScale * (1f + currentAudioPulse);
+    }
+
     // 1. เมื่อเอาเมาส์ไปจ่อ
     public void OnPointerEnter(PointerEventData eventData)
     {
         isHovered = true;
 
-        // เล่นเสียง Hover (ถ้ามีใส่ไว้)
-        if (hoverSFX != null && audioSource != null)
+        if (hoverSFX != null && sfxAudioSource != null)
         {
-            audioSource.PlayOneShot(hoverSFX, soundVolume);
+            sfxAudioSource.PlayOneShot(hoverSFX, soundVolume);
         }
 
         transform.DOKill();
@@ -73,11 +105,9 @@ public class JuicyButtonFX : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     // 3. เมื่อกดคลิก
     public void OnPointerDown(PointerEventData eventData)
     {
-        // เล่นเสียง Click SFX
-        if (clickSFX != null && audioSource != null)
+        if (clickSFX != null && sfxAudioSource != null)
         {
-            // PlayOneShot ช่วยให้เสียงเล่นซ้อนกันได้นุ่มนวล แม้จะกดคลิกย้ำๆ ไวๆ
-            audioSource.PlayOneShot(clickSFX, soundVolume);
+            sfxAudioSource.PlayOneShot(clickSFX, soundVolume);
         }
 
         transform.DOKill();
