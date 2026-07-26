@@ -818,7 +818,6 @@ Transform:
   - {fileID: 1884740452}
   - {fileID: 530312319}
   - {fileID: 265135655}
-  - {fileID: 1429171663}
   m_Father: {fileID: 1057407317}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &452937643
@@ -3156,8 +3155,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1429171663}
   - component: {fileID: 1429171664}
+  - component: {fileID: 1429171665}
   m_Layer: 0
-  m_Name: SLIMY_REVERSE
+  m_Name: blackthing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3172,11 +3172,11 @@ Transform:
   m_GameObject: {fileID: 1429171662}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.2844267, y: -8.797854, z: 0}
-  m_LocalScale: {x: 0.027552584, y: 0.027552584, z: 0.027552584}
+  m_LocalPosition: {x: 0.5, y: -0.5000305, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 452937642}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1429171664
 SpriteRenderer:
@@ -3233,6 +3233,28 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!95 &1429171665
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1429171662}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1471447999
 GameObject:
   m_ObjectHideFlags: 0
@@ -3337,7 +3359,7 @@ PlayableDirector:
   serializedVersion: 3
   m_PlayableAsset: {fileID: 11400000, guid: 37f65feac81c196479c74cc3b71b687d, type: 2}
   m_InitialState: 1
-  m_WrapMode: 2
+  m_WrapMode: 1
   m_DirectorUpdateMode: 1
   m_InitialTime: 0
   m_SceneBindings:
@@ -4612,4 +4634,5 @@ SceneRoots:
   - {fileID: 1057407317}
   - {fileID: 463119347}
   - {fileID: 1471965190}
+  - {fileID: 1429171663}
   - {fileID: 1253939005}
