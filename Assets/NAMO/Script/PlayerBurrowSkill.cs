@@ -140,4 +140,12 @@ public class PlayerBurrowSkill : MonoBehaviour
     }
 
     public bool IsProtected() => isBurrowed || hasShield;
+
+    public void TriggerBurrowFromSkillSystem()
+    {
+        if (!isBurrowed)
+        {
+            StartCoroutine(BurrowRoutine());
+        }
+    }
 }

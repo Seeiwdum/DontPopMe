@@ -1,11 +1,17 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 public class GameTutorialManager : MonoBehaviour
 {
     public static GameTutorialManager Instance { get; private set; }
+
+    // ใน GameTutorialManager.cs
+    [Header("Full Map Settings")]
+    [SerializeField] private BoxCollider2D fullMapBoundsCollider; // ลาก FullMapBounds มาวางตรงนี้!
+    [SerializeField] private float overviewCameraSize = 25f;
+    [SerializeField] private float cameraHoldDuration = 2f;
+    [SerializeField] private float cameraTransitionDuration = 1.5f;
 
     [Header("UI References")]
     [SerializeField] private CanvasGroup bannerCanvasGroup;
@@ -14,15 +20,20 @@ public class GameTutorialManager : MonoBehaviour
 
     [Header("Tutorial Zone Settings")]
     [SerializeField] private GameObject invisibleWalls;
-    [SerializeField] private SpriteRenderer tutorialFloorSprite; // Sprite WASD บนพื้น
+    [SerializeField] private SpriteRenderer tutorialFloorSprite;
     [SerializeField] private BubbleSpawner bubbleSpawner;
 
-    // Quest Tracking States
+    [Header("Full Map Camera Settings (ตั้งค่าระยะกล้องแมพใหญ่)")]
+    [SerializeField] private Vector3 fullMapCenter = Vector3.zero; // จุดศูนย์กลางหน้าคน
+    [Header("Full Map Bounds (ขอบแมพหน้าคนทั้งหมด)")]
+    [SerializeField] private float fullMapMinX = -40f;
+    [SerializeField] private float fullMapMaxX = 40f;
+    [SerializeField] private float fullMapMinY = -25f;
+    [SerializeField] private float fullMapMaxY = 25f;
+
     public enum QuestState { Movement, TrySkills, ZoneUnlocking, FreeRoam, WashingFaceEvent, MainGame }
     public QuestState CurrentState { get; private set; } = QuestState.Movement;
 
-    // Track Inputs
-    private bool pressedW, pressedA, pressedS, pressedD;
     private bool pressed1, pressed2, pressed3;
 
     private void Awake()
@@ -39,65 +50,106 @@ public class GameTutorialManager : MonoBehaviour
 
     private IEnumerator TutorialSequence()
     {
-        // Step 1: เควส WASD
-        yield return ShowBanner("Press W, A, S, D to walk");
-        yield return new WaitUntil(() => pressedW && pressedA && pressedS && pressedD);
+        // -------------------------------------------------------------
+        // 1. WASD Movement Quest
+        // -------------------------------------------------------------
+        CurrentState = QuestState.Movement;
+        yield return ShowBanner("กดปุ่ม W, A, S, D เพื่อทดลองเดิน");
+        
+        bool w = false, a = false, s = false, d = false;
+        while (!(w && a && s && d))
+        {
+            if (Input.GetKeyDown(KeyCode.W)) w = true;
+            if (Input.GetKeyDown(KeyCode.A)) a = true;
+            if (Input.GetKeyDown(KeyCode.S)) s = true;
+            if (Input.GetKeyDown(KeyCode.D)) d = true;
+            yield return null;
+        }
 
-        // Step 2: เควส กด Skill 1, 2, 3
-        yield return ShowBanner("Try out ur skill [1], [2], [3]");
-        yield return new WaitUntil(() => pressed1 && pressed2 && pressed3);
+        // -------------------------------------------------------------
+        // 2. Skill Quest (1, 2, 3)
+        // -------------------------------------------------------------
+        CurrentState = QuestState.TrySkills;
+        yield return ShowBanner("ทดลองกดใช้งานสกิล [1], [2], [3] ให้ครบทุกสกิล");
+        
+        while (!(pressed1 && pressed2 && pressed3))
+        {
+            yield return null;
+        }
 
-        // Step 3: ปลดล็อคโซนฝึกสอน
+        // -------------------------------------------------------------
+        // 3. Unlock Zone & Overview Camera Effect
+        // -------------------------------------------------------------
         CurrentState = QuestState.ZoneUnlocking;
-        yield return ShowBanner("Done! Let's Hob in to skin...");
+        yield return ShowBanner("ฝึกสอนสำเร็จ! ปลดล็อคเส้นทาง...");
 
-        if (invisibleWalls != null) invisibleWalls.SetActive(false); // เอา Invisible Wall ออก
+        // ปิดกำแพงล่องหน
+        if (invisibleWalls != null) invisibleWalls.SetActive(false);
 
-        // Fade Out พื้นฝึกสอนภายใน 5 วินาที
+        // สั่งกล้องให้แพนไปดูแมพหน้าคน
+        if (CameraFollow2D.Instance != null)
+        {
+            if (fullMapBoundsCollider != null)
+            {
+                // กรณีมี BoxCollider2D แมพใหญ่
+                CameraFollow2D.Instance.TriggerFaceMapOverview(
+                    fullMapBoundsCollider,
+                    overviewCameraSize,
+                    cameraHoldDuration,
+                    cameraTransitionDuration
+                );
+            }
+            else
+            {
+                // กรณีไม่มี Collider แมพใหญ่ สั่งปลดล็อคขอบเขตกล้องทันที
+                CameraFollow2D.Instance.DisableBounds();
+            }
+        }
+
+        // C. ค่อยๆ Fade รูป WASD บนพื้นให้หายไป
         if (tutorialFloorSprite != null)
         {
             float timer = 0f;
             Color initialColor = tutorialFloorSprite.color;
-            while (timer < 5f)
+            while (timer < 3f)
             {
                 timer += Time.deltaTime;
-                tutorialFloorSprite.color = new Color(initialColor.r, initialColor.g, initialColor.b, Mathf.Lerp(1f, 0f, timer / 5f));
+                float alpha = Mathf.Lerp(1f, 0f, timer / 3f);
+                tutorialFloorSprite.color = new Color(initialColor.r, initialColor.g, initialColor.b, alpha);
                 yield return null;
             }
             tutorialFloorSprite.gameObject.SetActive(false);
         }
 
-        // Step 4: ปล่อยเดินเล่นแปปนึง
+        // -------------------------------------------------------------
+        // 4. Free Roam (วิ่งเล่นบนแมพใหญ่)
+        // -------------------------------------------------------------
         CurrentState = QuestState.FreeRoam;
-        yield return ShowBanner("You");
-        yield return new WaitForSeconds(4f);
+        yield return ShowBanner("สำรวจพื้นที่ผิวหน้าได้ตามอิสระ");
+        yield return new WaitForSeconds(3f);
 
-        // Step 5: แจ้งเตือน Event ล้างหน้า!
+        // -------------------------------------------------------------
+        // 5. Event Washing Face
+        // -------------------------------------------------------------
         CurrentState = QuestState.WashingFaceEvent;
         yield return ShowBanner("⚠️ เขากำลังจะล้างหน้าแล้ว!! หลบฟองสบู่เร็ว!");
         yield return new WaitForSeconds(2.5f);
 
-        // Step 6: เข้าสู่ Main Game และเริ่มสปอนฟองสบู่
+        // -------------------------------------------------------------
+        // 6. Main Game
+        // -------------------------------------------------------------
         CurrentState = QuestState.MainGame;
         HideBanner();
         if (bubbleSpawner != null) bubbleSpawner.enabled = true;
     }
 
-    private void Update()
+    public void RegisterSkillPressed(int skillIndex)
     {
-        if (CurrentState == QuestState.Movement)
-        {
-            if (Input.GetKeyDown(KeyCode.W)) pressedW = true;
-            if (Input.GetKeyDown(KeyCode.A)) pressedA = true;
-            if (Input.GetKeyDown(KeyCode.S)) pressedS = true;
-            if (Input.GetKeyDown(KeyCode.D)) pressedD = true;
-        }
-        else if (CurrentState == QuestState.TrySkills)
-        {
-            if (Input.GetKeyDown(KeyCode.Alpha1)) pressed1 = true;
-            if (Input.GetKeyDown(KeyCode.Alpha2)) pressed2 = true;
-            if (Input.GetKeyDown(KeyCode.Alpha3)) pressed3 = true;
-        }
+        if (CurrentState != QuestState.TrySkills) return;
+
+        if (skillIndex == 1) pressed1 = true;
+        if (skillIndex == 2) pressed2 = true;
+        if (skillIndex == 3) pressed3 = true;
     }
 
     public IEnumerator ShowBanner(string text)
